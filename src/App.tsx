@@ -28,7 +28,7 @@ import {
 } from './lib/edit';
 import { clearProject, loadPrefs, loadProject, savePrefs, saveProject, type Prefs, type SavedProject } from './lib/storage';
 import type { Segment } from './lib/types';
-import type { WorkerEvent } from './lib/protocol';
+import type { Engine, WorkerEvent } from './lib/protocol';
 
 type Phase = 'landing' | 'setup' | 'editor';
 
@@ -86,7 +86,8 @@ export default function App() {
   const [partial, setPartial] = useState('');
   const [savedFlash, setSavedFlash] = useState(false);
 
-  const engineRef = useRef(createEngine());
+  const engineRef = useRef<Engine | null>(null);
+  engineRef.current ??= createEngine(); // created once, not on every render
   const playerRef = useRef<PlayerHandle>(null);
   const attachRef = useRef<HTMLInputElement>(null);
   const lastEdit = useRef<{ id: string; at: number } | null>(null);
@@ -99,7 +100,7 @@ export default function App() {
   useEffect(() => {
     void detectWebGPU().then(setWebgpu);
     const engine = engineRef.current;
-    return () => engine.dispose();
+    return () => engine?.dispose();
   }, []);
 
   useEffect(() => savePrefs(prefs), [prefs]);
@@ -237,7 +238,7 @@ export default function App() {
     dispatch({ type: 'reset', segments: [] });
     setWorking(true);
     setPhase('editor');
-    engineRef.current.start(
+    engineRef.current!.start(
       {
         type: 'transcribe',
         audio: audio.samples,
@@ -256,7 +257,7 @@ export default function App() {
   }, [audio, prefs, onEvent]);
 
   const cancel = useCallback(() => {
-    engineRef.current.cancel();
+    engineRef.current!.cancel();
     setWorking(false);
     setOutcome({ kind: 'cancelled', elapsedMs: 0 });
   }, []);
@@ -264,7 +265,7 @@ export default function App() {
   const reset = useCallback(() => {
     decodeToken.current++;
     setDecoding(false);
-    if (working) engineRef.current.cancel();
+    if (working) engineRef.current!.cancel();
     setWorking(false);
     setPhase('landing');
     setMedia(null);
