@@ -29,6 +29,8 @@ whole site is static files.
 
 ## Quick start
 
+Requires Node.js 20.19+ or 22.12+.
+
 ```bash
 npm install
 npm run dev          # http://localhost:5173
