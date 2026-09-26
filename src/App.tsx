@@ -9,6 +9,7 @@ import { SegmentList } from './components/SegmentList';
 import { Toolbar } from './components/Toolbar';
 import { ExportPanel } from './components/ExportPanel';
 import { Icon } from './components/Icon';
+import { Waveform } from './components/Waveform';
 import { emptyHistory, historyReducer } from './state';
 import { decodeFile, detectWebGPU, type DecodedAudio } from './lib/audio';
 import { createEngine } from './lib/engine';
@@ -399,7 +400,18 @@ export default function App() {
             <div className="editor-grid">
               <div className="left">
                 {media ? (
-                  <Player ref={playerRef} url={media.url} kind={media.kind} segments={segments} onTime={onTime} />
+                  <>
+                    <Player ref={playerRef} url={media.url} kind={media.kind} segments={segments} onTime={onTime} />
+                    {audio && (
+                      <Waveform
+                        samples={audio.samples}
+                        sampleRate={audio.sampleRate}
+                        segments={segments}
+                        time={time}
+                        onSeek={(v) => playerRef.current?.seek(v)}
+                      />
+                    )}
+                  </>
                 ) : (
                   <div className="card no-media">
                     <p className="muted">{t('editor.noMedia')}</p>

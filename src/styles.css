@@ -685,6 +685,26 @@ a {
 .player.audio audio {
   width: 100%;
 }
+.waveform {
+  display: block;
+  width: 100%;
+  height: 84px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  --wave: #7f9a90;
+  --cue: rgba(11, 107, 83, 0.14);
+  --cue-active: rgba(11, 107, 83, 0.34);
+  --head: #e5484d;
+}
+@media (prefers-color-scheme: dark) {
+  .waveform {
+    --wave: #6f8a80;
+    --cue: rgba(47, 181, 139, 0.16);
+    --cue-active: rgba(47, 181, 139, 0.38);
+  }
+}
 .no-media {
   text-align: center;
 }

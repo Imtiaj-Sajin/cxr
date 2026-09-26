@@ -52,6 +52,23 @@ test('full flow: upload video, transcribe, edit, preview caption, export SRT', a
   });
   await expect(page.getByTestId('caption')).toHaveText('এটা আমার এডিট করা লাইন');
 
+  // Clicking the waveform seeks: near the right edge of the 14 s view lands in the last cue.
+  const wave = page.getByTestId('waveform');
+  await expect(wave).toBeVisible();
+  const box = (await wave.boundingBox())!;
+  await wave.click({ position: { x: box.width * 0.9, y: box.height / 2 } });
+  await expect.poll(() => page.evaluate(() => document.querySelector('video')!.currentTime)).toBeGreaterThan(11);
+
+  // Ctrl+Enter splits the focused cue at the cursor.
+  const before = await rows.count();
+  const last = rows.last().locator('textarea');
+  await last.click();
+  await last.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(5, 5));
+  await last.press('Control+Enter');
+  await expect(rows).toHaveCount(before + 1);
+  await page.getByRole('button', { name: 'আনডু' }).click();
+  await expect(rows).toHaveCount(before);
+
   // Export SRT and check the content.
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-srt').click()]);
   expect(download.suggestedFilename()).toBe('speech-bn.srt');

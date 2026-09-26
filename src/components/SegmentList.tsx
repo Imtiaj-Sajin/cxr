@@ -103,12 +103,18 @@ const Row = memo(function Row({ seg, index, active, isLast, onChange, onSplit, o
           spellCheck={false}
           aria-label={`${t('editor.title')} ${index + 1}`}
           onChange={(e) => onChange(seg.id, { text: e.target.value })}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+              e.preventDefault();
+              onSplit(seg.id, e.currentTarget.selectionStart);
+            }
+          }}
         />
       </div>
       <div className="seg-actions">
         <button
           className="icon-btn"
-          title={t('editor.split')}
+          title={`${t('editor.split')} (Ctrl+Enter)`}
           aria-label={t('editor.split')}
           onClick={() => onSplit(seg.id, textRef.current?.selectionStart ?? Math.floor(seg.text.length / 2))}
         >
