@@ -54,6 +54,7 @@ export interface Prefs {
   banglaDigits: boolean;
   danda: boolean;
   speechLanguage: string;
+  task: 'transcribe' | 'translate';
 }
 
 export function loadPrefs(defaults: Prefs): Prefs {

@@ -14,6 +14,8 @@ export interface TranscribeRequest {
   /** Preferred backend; the worker falls back to wasm when WebGPU is unavailable. */
   device: Device | 'auto';
   language: string;
+  /** 'transcribe' keeps the spoken language; 'translate' writes English subtitles. */
+  task?: 'transcribe' | 'translate';
   timestamps: boolean;
   cueOptions: CueOptions;
   /** Load models from this local path instead of the Hugging Face Hub (used by tests). */

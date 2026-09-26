@@ -51,6 +51,7 @@ const DEFAULT_PREFS: Prefs = {
   banglaDigits: false,
   danda: false,
   speechLanguage: 'bengali',
+  task: 'transcribe',
 };
 
 function isSubtitleFile(file: File): boolean {
@@ -237,6 +238,7 @@ export default function App() {
         dtype: model.dtype,
         device: 'auto',
         language: prefs.speechLanguage,
+        task: prefs.task,
         timestamps: model.timestamps,
         cueOptions: { maxLineChars: prefs.maxLineChars, maxLines: 2 },
         localModelPath: new URLSearchParams(location.search).get('localModels') ?? undefined,
@@ -302,7 +304,11 @@ export default function App() {
   const activeIdx = useMemo(() => activeIndex(segments, time), [segments, time]);
   // Only judged right after a Bangla transcription, not for imported subtitle files.
   const wrongScript =
-    outcome?.kind === 'done' && prefs.speechLanguage === 'bengali' && segments.length >= 2 && nonBanglaShare(segments) > 0.4;
+    outcome?.kind === 'done' &&
+    prefs.speechLanguage === 'bengali' &&
+    prefs.task === 'transcribe' &&
+    segments.length >= 2 &&
+    nonBanglaShare(segments) > 0.4;
 
   const outcomeText = !outcome
     ? null
@@ -373,6 +379,8 @@ export default function App() {
             onModelChange={(id) => updatePrefs({ modelId: id })}
             speechLanguage={prefs.speechLanguage}
             onSpeechLanguageChange={(v) => updatePrefs({ speechLanguage: v })}
+            task={prefs.task}
+            onTaskChange={(v) => updatePrefs({ task: v })}
             maxLineChars={prefs.maxLineChars}
             onMaxLineCharsChange={(n) => updatePrefs({ maxLineChars: n })}
             onStart={start}

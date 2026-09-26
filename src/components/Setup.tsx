@@ -14,6 +14,8 @@ interface Props {
   onModelChange: (id: string) => void;
   speechLanguage: string;
   onSpeechLanguageChange: (lang: string) => void;
+  task: 'transcribe' | 'translate';
+  onTaskChange: (task: 'transcribe' | 'translate') => void;
   maxLineChars: number;
   onMaxLineCharsChange: (n: number) => void;
   onStart: () => void;
@@ -83,6 +85,13 @@ export function Setup(props: Props) {
             </select>
           </label>
           <label className="field">
+            <span>{t('setup.output')}</span>
+            <select value={props.task} onChange={(e) => props.onTaskChange(e.target.value as 'transcribe' | 'translate')}>
+              <option value="transcribe">{t('setup.output.same')}</option>
+              <option value="translate">{t('setup.output.english')}</option>
+            </select>
+          </label>
+          <label className="field">
             <span>{t('setup.lineLength')}</span>
             <input
               type="number"
@@ -93,6 +102,8 @@ export function Setup(props: Props) {
             />
           </label>
         </div>
+
+        {props.task === 'translate' && selected?.bangla && <p className="hint">{t('setup.translateHint')}</p>}
 
         <button className="link-btn small" onClick={() => setShowAdvanced((v) => !v)} aria-expanded={showAdvanced}>
           {t('setup.advanced')} {showAdvanced ? '▴' : '▾'}
