@@ -8,6 +8,8 @@ export type AsrPipeline = ((
   options: Record<string, unknown>,
 ) => Promise<{ text: string; chunks?: { text: string; timestamp: [number | null, number | null] }[] }>) & {
   dispose?: () => Promise<unknown>;
+  /** Optional: create a streamer that reports decoded text while a piece is generated. */
+  makeStreamer?: (onText: (text: string) => void) => unknown;
 };
 
 export interface PipelineFactory {
@@ -95,7 +97,13 @@ export async function transcribe(
     }
     const piece = pieces[i];
     const audio = sliceSamples(req.audio, req.sampleRate, piece);
+    let partial = '';
+    const streamer = loaded.asr.makeStreamer?.((text) => {
+      partial += text;
+      emit({ type: 'partial', index: i, text: partial });
+    });
     const output = await loaded.asr(audio, {
+      ...(streamer ? { streamer } : {}),
       language: req.language === 'auto' ? undefined : req.language,
       task: req.task ?? 'transcribe',
       return_timestamps: req.timestamps,

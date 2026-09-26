@@ -602,6 +602,28 @@ a {
     transform: translateX(300%);
   }
 }
+.live-text {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.live-text .cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--primary);
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink {
+  to {
+    opacity: 0;
+  }
+}
 .progress-foot {
   display: flex;
   justify-content: space-between;

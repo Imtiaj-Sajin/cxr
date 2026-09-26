@@ -83,6 +83,7 @@ export default function App() {
   const [progress, setProgress] = useState<ProgressState>(initialProgress);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [time, setTime] = useState(0);
+  const [partial, setPartial] = useState('');
   const [savedFlash, setSavedFlash] = useState(false);
 
   const engineRef = useRef(createEngine());
@@ -203,7 +204,11 @@ export default function App() {
       case 'plan':
         setProgress((p) => ({ ...p, pieces: e.pieces, speechSeconds: e.speechSeconds }));
         break;
+      case 'partial':
+        setPartial(e.text);
+        break;
       case 'segments':
+        setPartial('');
         dispatch({ type: 'append', segments: e.segments });
         setProgress((p) => ({ ...p, done: e.index + 1, processedSeconds: e.processedSeconds }));
         break;
@@ -228,6 +233,7 @@ export default function App() {
     setError(null);
     setOutcome(null);
     setProgress({ ...initialProgress });
+    setPartial('');
     dispatch({ type: 'reset', segments: [] });
     setWorking(true);
     setPhase('editor');
@@ -392,7 +398,7 @@ export default function App() {
 
         {phase === 'editor' && (
           <main className="editor">
-            {working && <Progress p={progress} onCancel={cancel} />}
+            {working && <Progress p={progress} partial={partial} onCancel={cancel} />}
             {!working && outcomeText && (
               <div className={`banner ${outcome?.kind === 'done' && segments.length > 0 ? 'success' : 'info'}`} role="status" data-testid="outcome">
                 <Icon name={outcome?.kind === 'done' ? 'check' : 'clock'} size={18} />

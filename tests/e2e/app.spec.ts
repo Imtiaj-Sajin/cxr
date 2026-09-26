@@ -142,6 +142,16 @@ test('work is autosaved and can be resumed after reload', async ({ page }) => {
   await expect(page.getByText('সাবটাইটেল প্রিভিউ দেখতে')).toBeVisible();
 });
 
+test('shows text live while a piece is being written', async ({ page }) => {
+  await freshPage(page, '?engine=mock&mockDelay=500');
+  await page.getByTestId('file-input').setInputFiles(VIDEO);
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 20_000 });
+  await page.getByTestId('start').click();
+  // waitForSelector checks every animation frame; the mock shows each partial line briefly.
+  const live = await page.waitForSelector('[data-testid=live-text]', { timeout: 10_000 });
+  expect(await live.textContent()).toContain('আসসালামু');
+});
+
 test('stopping a transcription keeps the finished lines', async ({ page }) => {
   await freshPage(page, '?engine=mock&mockDelay=400');
   await page.getByTestId('file-input').setInputFiles(VIDEO);

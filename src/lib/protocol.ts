@@ -33,6 +33,7 @@ export type WorkerEvent =
   | { type: 'load-progress'; loaded: number; total: number; progress: number; file?: string }
   | { type: 'ready'; device: Device; fromCache: boolean }
   | { type: 'plan'; pieces: number; speechSeconds: number }
+  | { type: 'partial'; index: number; text: string }
   | { type: 'segments'; index: number; total: number; segments: Segment[]; processedSeconds: number }
   | { type: 'done'; elapsedMs: number; cancelled: boolean }
   | { type: 'error'; message: string };

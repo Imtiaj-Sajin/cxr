@@ -38,7 +38,7 @@ function formatDuration(seconds: number, lang: 'bn' | 'en'): string {
 
 export { formatDuration };
 
-export function Progress({ p, onCancel }: { p: ProgressState; onCancel: () => void }) {
+export function Progress({ p, partial = '', onCancel }: { p: ProgressState; partial?: string; onCancel: () => void }) {
   const { t, lang } = useI18n();
   let fraction = 0;
   let label = '';
@@ -85,6 +85,13 @@ export function Progress({ p, onCancel }: { p: ProgressState; onCancel: () => vo
       >
         <div style={{ width: `${pct}%` }} />
       </div>
+      {p.stage === 'transcribing' && partial.trim() && (
+        <p className="live-text" data-testid="live-text" lang="bn">
+          {/* Show only the tail so long pieces do not push the layout around. */}
+          {partial.trim().length > 110 ? `…${partial.trim().slice(-110)}` : partial.trim()}
+          <span className="cursor" aria-hidden="true" />
+        </p>
+      )}
       <div className="progress-foot muted">
         <span>{detail}</span>
         {p.stage === 'transcribing' && <span>{t('progress.liveHint')}</span>}

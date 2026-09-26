@@ -91,3 +91,21 @@ describe('worker core', () => {
     expect(disposed).toBe(true);
   });
 });
+
+describe('streaming', () => {
+  it('reports partial text through the streamer hook', async () => {
+    const events: WorkerEvent[] = [];
+    const asr = Object.assign(
+      (async (_a: Float32Array, options: Record<string, unknown>) => {
+        const s = options.streamer as { put: (t: string) => void };
+        s.put('আমি ');
+        s.put('ভালো');
+        return { text: 'আমি ভালো' };
+      }) as AsrPipeline,
+      { makeStreamer: (onText: (t: string) => void) => ({ put: onText }) },
+    );
+    await transcribe(request(), { key: 'k', device: 'wasm', asr }, (e) => events.push(e), () => false);
+    const partials = events.filter((e) => e.type === 'partial');
+    expect(partials.at(-1)).toMatchObject({ type: 'partial', text: 'আমি ভালো' });
+  });
+});

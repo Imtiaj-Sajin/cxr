@@ -74,13 +74,15 @@ export class MockEngine implements Engine {
     ];
     let processed = 0;
     pieces.forEach((piece, i) => {
+      const line = MOCK_LINES[i % MOCK_LINES.length];
+      steps.push(() => onEvent({ type: 'partial', index: i, text: line.slice(0, Math.ceil(line.length / 2)) }));
       steps.push(() => {
         processed += piece.end - piece.start;
         onEvent({
           type: 'segments',
           index: i,
           total: pieces.length,
-          segments: textToCues(piece, MOCK_LINES[i % MOCK_LINES.length], request.cueOptions),
+          segments: textToCues(piece, line, request.cueOptions),
           processedSeconds: processed,
         });
       });

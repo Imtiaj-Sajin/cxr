@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { env, pipeline } from '@huggingface/transformers';
+import { env, pipeline, WhisperTextStreamer } from '@huggingface/transformers';
 // Serve the ONNX Runtime WASM files from our own origin instead of a CDN: works offline
 // after the first visit, keeps working where the CDN is blocked, and keeps the app private.
 import ortWasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.asyncify.wasm?url';
@@ -59,7 +59,13 @@ const factory: PipelineFactory = async ({ modelId, device, dtype, localModelPath
       }
     },
   });
-  return asr as unknown as AsrPipeline;
+  const wrapped = asr as unknown as AsrPipeline;
+  wrapped.makeStreamer = (onText) =>
+    new WhisperTextStreamer((asr as unknown as { tokenizer: never }).tokenizer, {
+      skip_prompt: true,
+      callback_function: onText,
+    });
+  return wrapped;
 };
 
 self.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
