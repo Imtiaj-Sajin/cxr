@@ -84,7 +84,9 @@ export function cleanTranscript(text: string): string {
   const cleaned = text
     .replace(/<\|[^|]*\|>/g, ' ') // stray special tokens such as <|bn|>
     .replace(/([.…।,!?\-_*~])\1{3,}/g, (_m, ch: string) => (ch === '.' ? '...' : ch)) // "............" -> "..."
-    .replace(/(\S{1,8}?)\1{5,}/gu, '$1$1') // loops without spaces: "হাহাহাহাহাহাহা" -> "হাহা"
+    // Loops without spaces ("হাহাহাহাহাহাহা" -> "হাহা"). Digits are excluded so numbers
+    // such as 1000000 survive.
+    .replace(/((?:(?![0-9০-৯])\S){1,8}?)\1{5,}/gu, '$1$1')
     .replace(/\s+/g, ' ')
     .trim();
   return collapseRepeats(cleaned);
@@ -92,7 +94,8 @@ export function cleanTranscript(text: string): string {
 
 /** Split text into sentence-like units, keeping the punctuation. */
 export function splitSentences(text: string): string[] {
-  const parts = text.match(/[^।?!.]+[।?!.]*\s*/g) ?? [text];
+  // A '.' only ends a sentence before whitespace or the end, so "3.5" stays together.
+  const parts = text.match(/(?:[^।?!.]|\.(?=\S))+[।?!.]*\s*/g) ?? [text];
   return parts.map((p) => p.trim()).filter(Boolean);
 }
 

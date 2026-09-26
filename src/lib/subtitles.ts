@@ -53,7 +53,8 @@ export function toSRT(segments: Segment[]): string {
   return sortedValid(segments)
     .map(
       (seg, i) =>
-        `${i + 1}\n${formatTimestamp(seg.start, ',')} --> ${formatTimestamp(seg.end, ',')}\n${seg.text.trim()}\n`,
+        // A blank line inside the text would end the cue early in players.
+        `${i + 1}\n${formatTimestamp(seg.start, ',')} --> ${formatTimestamp(seg.end, ',')}\n${seg.text.trim().replace(/\n{2,}/g, '\n')}\n`,
     )
     .join('\n');
 }

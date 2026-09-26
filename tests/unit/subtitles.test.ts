@@ -56,8 +56,9 @@ describe('exporters', () => {
     const vtt = toVTT(segs);
     expect(vtt.startsWith('WEBVTT\n\n00:00:00.500 --> 00:00:01.750\nআমার সোনার বাংলা\n')).toBe(true);
   });
-  it('collapses blank lines inside VTT cues', () => {
+  it('collapses blank lines inside cues', () => {
     expect(toVTT([makeSegment(0, 1, 'a\n\n\nb')])).toContain('a\nb');
+    expect(toSRT([makeSegment(0, 1, 'a\n\nb')])).toBe('1\n00:00:00,000 --> 00:00:01,000\na\nb\n');
   });
   it('writes plain text with and without times', () => {
     expect(toTXT(segs)).toBe('আমার সোনার বাংলা\nদ্বিতীয় লাইন');

@@ -57,6 +57,8 @@ describe('hallucination handling', () => {
     expect(cleanTranscript('আমি যাব' + '.'.repeat(300))).toBe('আমি যাব...');
     expect(cleanTranscript('হা' + 'হা'.repeat(20) + ' শেষ')).toBe('হাহা শেষ');
     expect(cleanTranscript('হাহাহা ঠিক আছে')).toBe('হাহাহা ঠিক আছে');
+    // Numbers are not repetition loops.
+    expect(cleanTranscript('দাম ১০০০০০০ টাকা, মানে 1000000')).toBe('দাম ১০০০০০০ টাকা, মানে 1000000');
   });
   it('cleans special tokens and whitespace', () => {
     expect(cleanTranscript('<|bn|>  আমি   ভালো\nআছি ')).toBe('আমি ভালো আছি');
@@ -66,6 +68,10 @@ describe('hallucination handling', () => {
 describe('splitSentences', () => {
   it('splits on Bangla and Latin sentence marks', () => {
     expect(splitSentences('আমি যাব। তুমি যাবে? হ্যাঁ! ok. end')).toEqual(['আমি যাব।', 'তুমি যাবে?', 'হ্যাঁ!', 'ok.', 'end']);
+  });
+  it('keeps decimals and abbreviations with no space inside one sentence', () => {
+    expect(splitSentences('দাম ৩.৫ টাকা। শেষ')).toEqual(['দাম ৩.৫ টাকা।', 'শেষ']);
+    expect(splitSentences('version 2.0 is out... yes')).toEqual(['version 2.0 is out...', 'yes']);
   });
 });
 

@@ -28,8 +28,9 @@ export function historyReducer(state: History, action: HistoryAction): History {
     case 'transform':
       return historyReducer(state, { type: 'set', segments: action.fn(state.present), record: action.record });
     case 'append':
-      // Streaming results are not undo steps.
-      return { ...state, present: [...state.present, ...action.segments] };
+      // Streaming results are not undo steps. Older snapshots lack the new cues, so
+      // undoing to one would silently drop them: clear the history instead.
+      return { past: [], present: [...state.present, ...action.segments], future: [] };
     case 'undo': {
       if (state.past.length === 0) return state;
       const prev = state.past[state.past.length - 1];

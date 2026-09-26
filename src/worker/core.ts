@@ -3,10 +3,12 @@ import { chunksToCues, textToCues } from '../lib/postprocess';
 import type { Device, TranscribeRequest, WorkerEvent } from '../lib/protocol';
 
 /** Minimal shape of the transformers.js ASR pipeline we depend on. */
-export type AsrPipeline = (
+export type AsrPipeline = ((
   audio: Float32Array,
   options: Record<string, unknown>,
-) => Promise<{ text: string; chunks?: { text: string; timestamp: [number | null, number | null] }[] }>;
+) => Promise<{ text: string; chunks?: { text: string; timestamp: [number | null, number | null] }[] }>) & {
+  dispose?: () => Promise<unknown>;
+};
 
 export interface PipelineFactory {
   (args: {
@@ -46,6 +48,10 @@ export async function loadPipeline(
       return cached;
     }
   }
+
+  // Free the previous model's (GPU) memory before loading another one; phones cannot
+  // hold two speech models at once.
+  if (cached) await cached.asr.dispose?.().catch(() => undefined);
 
   let lastError: unknown = null;
   for (const device of usable) {

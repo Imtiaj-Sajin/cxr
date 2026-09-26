@@ -76,7 +76,7 @@ export const Player = forwardRef<PlayerHandle, Props>(function Player({ url, kin
           <div className="audio-caption" data-testid="caption">
             {caption ? <span>{caption}</span> : <span className="muted">…</span>}
           </div>
-          <audio ref={mediaRef} src={url} controls preload="metadata" />
+          <audio ref={mediaRef} src={url} controls preload="metadata" onPause={() => (stopAt.current = null)} />
         </div>
       )}
     </div>

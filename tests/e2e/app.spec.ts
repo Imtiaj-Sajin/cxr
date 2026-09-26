@@ -148,3 +148,18 @@ test('burn subtitles into a video', async ({ page }) => {
   const bytes = await readFile(await download.path());
   expect(bytes.length).toBeGreaterThan(20_000);
 });
+
+test('cancelling a burn stops it without downloading', async ({ page }) => {
+  await freshPage(page);
+  await page.getByTestId('file-input').setInputFiles(VIDEO);
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 20_000 });
+  await page.getByTestId('start').click();
+  await expect(page.getByTestId('outcome')).toBeVisible({ timeout: 20_000 });
+  let downloaded = false;
+  page.on('download', () => (downloaded = true));
+  await page.getByTestId('burn').click();
+  await page.getByRole('button', { name: 'বাতিল' }).click();
+  await expect(page.getByTestId('burn')).toBeVisible();
+  await page.waitForTimeout(1500);
+  expect(downloaded).toBe(false);
+});

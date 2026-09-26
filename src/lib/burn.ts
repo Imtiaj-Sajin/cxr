@@ -98,6 +98,8 @@ function drawWatermark(ctx: CanvasRenderingContext2D, text: string, width: numbe
 export async function burnSubtitles(opts: BurnOptions): Promise<Blob> {
   const mime = pickRecorderMime();
   if (!mime) throw new Error('UNSUPPORTED');
+  const abortError = () => new DOMException('Aborted', 'AbortError');
+  if (opts.signal?.aborted) throw abortError();
 
   const media = document.createElement(opts.kind === 'video' ? 'video' : 'audio') as HTMLMediaElement;
   media.src = opts.mediaUrl;
@@ -107,6 +109,7 @@ export async function burnSubtitles(opts: BurnOptions): Promise<Blob> {
   await new Promise<void>((resolve, reject) => {
     media.addEventListener('loadedmetadata', () => resolve(), { once: true });
     media.addEventListener('error', () => reject(new Error('MEDIA_LOAD_FAILED')), { once: true });
+    opts.signal?.addEventListener('abort', () => reject(abortError()), { once: true });
   });
 
   const video = media instanceof HTMLVideoElement ? media : null;
@@ -154,11 +157,15 @@ export async function burnSubtitles(opts: BurnOptions): Promise<Blob> {
   });
 
   let raf = 0;
+  let stopped = false;
   const loop = () => {
     draw();
     raf = requestAnimationFrame(loop);
   };
+  /** Idempotent cleanup: stops playback, the recorder, all tracks and the audio graph. */
   const stop = () => {
+    if (stopped) return;
+    stopped = true;
     cancelAnimationFrame(raf);
     media.pause();
     if (recorder.state !== 'inactive') recorder.stop();
@@ -171,15 +178,21 @@ export async function burnSubtitles(opts: BurnOptions): Promise<Blob> {
     stop();
   });
 
-  media.currentTime = 0;
-  draw();
-  recorder.start(1000);
-  await audioCtx.resume();
-  await media.play();
-  loop();
+  try {
+    if (opts.signal?.aborted) throw abortError();
+    media.currentTime = 0;
+    draw();
+    recorder.start(1000);
+    await audioCtx.resume();
+    await media.play();
+    loop();
+  } catch (err) {
+    stop();
+    throw err;
+  }
 
   const blob = await done;
-  if (opts.signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+  if (opts.signal?.aborted) throw abortError();
   return blob;
 }
 

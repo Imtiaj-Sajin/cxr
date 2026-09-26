@@ -26,6 +26,15 @@ describe('historyReducer', () => {
     expect(s.past).toHaveLength(0);
   });
 
+  it('streamed cues invalidate older undo snapshots instead of being lost on undo', () => {
+    let s = historyReducer(emptyHistory, { type: 'append', segments: [makeSegment(0, 1, 'ক')] });
+    s = historyReducer(s, { type: 'transform', fn: (l) => l.map((x) => ({ ...x, text: 'এডিট' })) });
+    expect(s.past).toHaveLength(1);
+    s = historyReducer(s, { type: 'append', segments: [makeSegment(1, 2, 'খ')] });
+    s = historyReducer(s, { type: 'undo' });
+    expect(s.present).toHaveLength(2);
+  });
+
   it('a new edit clears the redo stack', () => {
     let s = historyReducer(emptyHistory, { type: 'set', segments: [makeSegment(0, 1, 'ক')] });
     s = historyReducer(s, { type: 'undo' });
