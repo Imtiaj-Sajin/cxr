@@ -13,7 +13,8 @@ import { Waveform } from './components/Waveform';
 import { emptyHistory, historyReducer } from './state';
 import { decodeFile, detectWebGPU, type DecodedAudio } from './lib/audio';
 import { createEngine } from './lib/engine';
-import { findModel, DEFAULT_MODEL_ID } from './lib/models';
+import { findModel, DEFAULT_MODEL_ID, PHONE_DEFAULT_MODEL_ID } from './lib/models';
+import { isLowMemoryDevice } from './lib/device';
 import { parseSubtitles } from './lib/subtitles';
 import { nonBanglaShare, normalizeDanda, tidySegments, toBanglaDigits, toLatinDigits } from './lib/postprocess';
 import {
@@ -46,7 +47,7 @@ const REPO_URL = 'https://github.com/Imtiaj-Sajin/cxr';
 
 const DEFAULT_PREFS: Prefs = {
   lang: detectLang(),
-  modelId: DEFAULT_MODEL_ID,
+  modelId: isLowMemoryDevice() ? PHONE_DEFAULT_MODEL_ID : DEFAULT_MODEL_ID,
   maxLineChars: 42,
   banglaDigits: false,
   danda: false,
@@ -104,6 +105,21 @@ export default function App() {
   }, []);
 
   useEffect(() => savePrefs(prefs), [prefs]);
+  // Surface errors from async code (which React error boundaries cannot catch).
+  useEffect(() => {
+    const show = (message: string) =>
+      setError(translate(prefsLangRef.current, 'error.generic', { message: message || 'unknown error' }));
+    // ResizeObserver loop warnings are harmless browser noise.
+    const onError = (e: ErrorEvent) => !/ResizeObserver/.test(e.message) && show(e.message);
+    const onRejection = (e: PromiseRejectionEvent) =>
+      show(e.reason instanceof Error ? e.reason.message : String(e.reason));
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onRejection);
+    return () => {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onRejection);
+    };
+  }, []);
   // Each phase is a new screen: start it at the top (on phones the Start button sits low).
   useEffect(() => window.scrollTo({ top: 0 }), [phase]);
   useEffect(() => {
@@ -245,7 +261,8 @@ export default function App() {
         sampleRate: audio.sampleRate,
         modelId: model.id,
         dtype: model.dtype,
-        device: 'auto',
+        // Phone GPUs often crash on the ~400 MB GPU model; the CPU path uses far less memory.
+        device: isLowMemoryDevice() ? 'wasm' : 'auto',
         language: prefs.speechLanguage,
         task: prefs.task,
         timestamps: model.timestamps,
@@ -383,7 +400,7 @@ export default function App() {
             fileName={fileName}
             duration={audio?.duration ?? null}
             decoding={decoding}
-            webgpu={webgpu}
+            webgpu={webgpu && !isLowMemoryDevice()}
             modelId={prefs.modelId}
             onModelChange={(id) => updatePrefs({ modelId: id })}
             speechLanguage={prefs.speechLanguage}

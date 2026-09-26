@@ -97,6 +97,25 @@ a {
   flex-direction: column;
 }
 
+.crash {
+  max-width: 640px;
+  margin: 3rem auto;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.crash h1 {
+  font-size: 1.3rem;
+}
+.crash pre {
+  white-space: pre-wrap;
+  background: var(--surface-2);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
 /* ---------- Header ---------- */
 .header {
   display: flex;

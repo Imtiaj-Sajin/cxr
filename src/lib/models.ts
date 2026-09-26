@@ -67,6 +67,9 @@ export const MODELS: ModelOption[] = BANGLA_MODEL ? [BANGLA_MODEL, ...BUILTIN_MO
 
 export const DEFAULT_MODEL_ID = BANGLA_MODEL?.id ?? 'onnx-community/whisper-small';
 
+/** Phones get the small model unless a Bangla model is configured. */
+export const PHONE_DEFAULT_MODEL_ID = BANGLA_MODEL?.id ?? 'onnx-community/whisper-base';
+
 /** Build an option for a model id typed in by the user. */
 export function customModel(id: string, timestamps = false): ModelOption {
   return {
