@@ -123,6 +123,16 @@ export function Landing({ onFile, saved, onResume, onDiscard }: Props) {
         <Feature icon="lock" title={t('feat.private.title')} body={t('feat.private.body')} />
         <Feature icon="edit" title={t('feat.editor.title')} body={t('feat.editor.body')} />
       </section>
+
+      <section className="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">{t('faq.title')}</h2>
+        {([1, 2, 3, 4, 5] as const).map((n) => (
+          <details key={n}>
+            <summary>{t(`faq.q${n}`)}</summary>
+            <p className="muted">{t(`faq.a${n}`)}</p>
+          </details>
+        ))}
+      </section>
     </main>
   );
 }

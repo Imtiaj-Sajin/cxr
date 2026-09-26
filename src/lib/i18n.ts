@@ -111,6 +111,23 @@ const en = {
   'footer.privacy': 'Everything runs in your browser. No uploads, no accounts, no tracking of your files.',
   'footer.madeBy': 'Made by {name}',
   'footer.source': 'Source code',
+  'faq.title': 'Questions',
+  'faq.q1': 'Is it really free? What is the catch?',
+  'faq.a1':
+    'Yes. The speech model runs on your own computer or phone, so there are no server costs to pass on. There are no minute limits and no sign-up.',
+  'faq.q2': 'Is my video uploaded anywhere?',
+  'faq.a2':
+    'No. The file is read and transcribed inside your browser tab. Only the speech model itself is downloaded once, from Hugging Face.',
+  'faq.q3': 'How accurate is it?',
+  'faq.a3':
+    'It depends on the model and the audio. Clear speech works best; music and several people talking at once are harder. Always read through the subtitles and fix mistakes in the editor before publishing.',
+  'faq.q4': 'How do I add the subtitles to YouTube or Facebook?',
+  'faq.a4':
+    'Download the SRT file. On YouTube: Studio → Subtitles → Add language → Upload file. On Facebook: edit the video → Subtitles & captions → Upload SRT.',
+  'faq.q5': 'Why is it slow on my computer?',
+  'faq.a5':
+    'Without WebGPU the model runs on the CPU. Use the latest Chrome or Edge, choose the Fast model, and keep the tab open. The first run also downloads the model.',
+  'error.tooLarge': 'This file is {size} GB. Files above {max} GB may crash the browser tab. Please cut or compress it first.',
   'common.close': 'Close',
   'common.cancel': 'Cancel',
   'time.justNow': 'just now',
@@ -232,6 +249,23 @@ const bn: Record<MessageKey, string> = {
   'footer.privacy': 'সবকিছু আপনার ব্রাউজারেই চলে। কোনো আপলোড নেই, অ্যাকাউন্ট নেই, আপনার ফাইলের উপর কোনো নজরদারি নেই।',
   'footer.madeBy': 'বানিয়েছেন {name}',
   'footer.source': 'সোর্স কোড',
+  'faq.title': 'প্রশ্ন ও উত্তর',
+  'faq.q1': 'সত্যিই ফ্রি? কোনো শর্ত আছে?',
+  'faq.a1':
+    'হ্যাঁ, ফ্রি। স্পিচ মডেলটি আপনার নিজের কম্পিউটার বা ফোনে চলে, তাই আমাদের কোনো সার্ভার খরচ নেই। মিনিটের লিমিট নেই, সাইন-আপও লাগে না।',
+  'faq.q2': 'আমার ভিডিও কি কোথাও আপলোড হয়?',
+  'faq.a2':
+    'না। ফাইলটি আপনার ব্রাউজারের ভেতরেই পড়া ও লেখা হয়। শুধু স্পিচ মডেলটি একবার Hugging Face থেকে ডাউনলোড হয়।',
+  'faq.q3': 'কতটা নির্ভুল?',
+  'faq.a3':
+    'মডেল আর অডিওর মানের উপর নির্ভর করে। পরিষ্কার কথায় সবচেয়ে ভালো কাজ করে; গান বা একসাথে অনেকে কথা বললে কঠিন হয়। পাবলিশ করার আগে এডিটরে একবার পড়ে ভুলগুলো ঠিক করে নিন।',
+  'faq.q4': 'ইউটিউব বা ফেসবুকে সাবটাইটেল কিভাবে দেব?',
+  'faq.a4':
+    'SRT ফাইল ডাউনলোড করুন। ইউটিউবে: Studio → Subtitles → Add language → Upload file। ফেসবুকে: ভিডিও এডিট → Subtitles & captions → SRT আপলোড।',
+  'faq.q5': 'আমার কম্পিউটারে ধীরে চলছে কেন?',
+  'faq.a5':
+    'WebGPU না থাকলে মডেলটি CPU-তে চলে। Chrome বা Edge-এর নতুন ভার্সন ব্যবহার করুন, “দ্রুত” মডেল বেছে নিন, আর ট্যাবটি খোলা রাখুন। প্রথমবার মডেল ডাউনলোডেও কিছু সময় লাগে।',
+  'error.tooLarge': 'ফাইলটি {size} GB। {max} GB-এর বড় ফাইলে ব্রাউজার ট্যাব ক্র্যাশ করতে পারে। আগে কেটে বা কমপ্রেস করে নিন।',
   'common.close': 'বন্ধ করুন',
   'common.cancel': 'বাতিল',
   'time.justNow': 'এইমাত্র',

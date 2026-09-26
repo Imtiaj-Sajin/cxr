@@ -389,6 +389,29 @@ a {
   place-items: center;
 }
 
+.faq {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+.faq h2 {
+  font-size: 1.3rem;
+  margin: 0 0 0.75rem;
+}
+.faq details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.faq summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.faq details p {
+  margin: 0.6rem 0 0.2rem;
+}
+
 /* ---------- Setup ---------- */
 .setup {
   width: min(680px, 100%);

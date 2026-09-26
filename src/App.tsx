@@ -138,6 +138,13 @@ export default function App() {
   const loadMedia = useCallback(
     async (file: File, attachOnly: boolean) => {
       setError(null);
+      // The whole file is read into memory to decode its audio; very large files can
+      // exhaust a tab's memory, so stop early with a clear message.
+      const MAX_GB = 2;
+      if (file.size > MAX_GB * 1024 ** 3) {
+        setError(t('error.tooLarge', { size: (file.size / 1024 ** 3).toFixed(1), max: MAX_GB }));
+        return;
+      }
       const kind: Media['kind'] = file.type.startsWith('audio/') || /\.(mp3|wav|m4a|aac|ogg|opus|flac)$/i.test(file.name) ? 'audio' : 'video';
       setMedia({ url: URL.createObjectURL(file), kind });
       if (attachOnly) return;
