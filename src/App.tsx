@@ -102,6 +102,8 @@ export default function App() {
   }, []);
 
   useEffect(() => savePrefs(prefs), [prefs]);
+  // Each phase is a new screen: start it at the top (on phones the Start button sits low).
+  useEffect(() => window.scrollTo({ top: 0 }), [phase]);
   useEffect(() => {
     document.documentElement.lang = lang;
     document.title = `${translate(lang, 'app.name')} · ${translate(lang, 'app.tagline')}`;
