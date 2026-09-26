@@ -95,3 +95,27 @@ The same pattern as Gap A, applied more widely: global tools support a language 
 - Bangla subtitles: [Kapwing](https://www.kapwing.com/subtitles/video/bangla), [Sonix](https://sonix.ai/how-to-create-bengali-subtitles), [CapsAI](https://capsai.co/bengali-subtitle-generator)
 - Bangla ASR quality: [Bangla STT benchmark v1.0.0](https://github.com/riverbornai/bangla-speech-to-text-benchmark/releases/tag/v1.0.0), [Bangla-WhisperDiar](https://arxiv.org/pdf/2605.08214), [BanglaSpeech2Text](https://github.com/shhossain/BanglaSpeech2Text)
 - Idea mining method: [Linkeddit on Reddit complaints](https://linkeddit.com/blog/find-saas-ideas-from-reddit-complaints)
+
+---
+
+## 6. Decision (26 Sept 2026): build Gap A as a zero-cost, in-browser tool
+
+Hosted transcription APIs (Soniox at $0.10/h) would still cost real money with many
+free users. The chosen design removes server costs completely: the speech model runs
+**in the visitor's browser** (WebGPU, or the CPU via WebAssembly), and the site is
+static files on free hosting. The product is **Kotha** (`README.md`), and the launch
+plan is in `docs/LAUNCH.md`.
+
+What I verified while building it:
+
+- Whisper's tokenizer uses about **2 tokens per Bangla character** (~10 per word), and
+  one decoding window holds only 448 tokens. So audio has to be cut into short pieces
+  (at most 12 s), or fast Bangla speech gets truncated.
+- Generic small Whisper models fail badly on Bangla. whisper-tiny answers in English even
+  when the Bangla language token is forced. A **Bangla fine-tuned model is essential**;
+  `tools/convert_model.py` converts one to the browser format and was tested end to end.
+- The full browser pipeline (decode → speech detection → Web Worker inference → editor
+  → SRT/VTT/burned-in video) runs with a real model in automated tests.
+
+Open question for the first real test: accuracy of the converted Bangla model on real
+YouTube-style audio (`scripts/evaluate.ts` measures it).
