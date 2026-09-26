@@ -57,7 +57,12 @@ function isSubtitleFile(file: File): boolean {
 }
 
 export default function App() {
-  const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs(DEFAULT_PREFS));
+  const [prefs, setPrefs] = useState<Prefs>(() => {
+    const loaded = loadPrefs(DEFAULT_PREFS);
+    // `?model=owner/name` preselects a model (handy for sharing a link to a custom model).
+    const fromUrl = new URLSearchParams(location.search).get('model');
+    return fromUrl ? { ...loaded, modelId: fromUrl } : loaded;
+  });
   const lang: Lang = prefs.lang;
   const t = useCallback((key: MessageKey, vars?: Record<string, string | number>) => translate(lang, key, vars), [lang]);
 

@@ -26,6 +26,7 @@
   "dependencies": {
     "@fontsource/noto-sans-bengali": "^5.3.0",
     "@huggingface/transformers": "^4.3.0",
+    "onnxruntime-web": "1.31.0-dev.20260914-8d85527a0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   }

@@ -1,5 +1,11 @@
 /// <reference lib="webworker" />
 import { env, pipeline } from '@huggingface/transformers';
+// Serve the ONNX Runtime WASM files from our own origin instead of a CDN: works offline
+// after the first visit, keeps working where the CDN is blocked, and keeps the app private.
+import ortWasmUrl from 'onnxruntime-web/ort-wasm-simd-threaded.asyncify.wasm?url';
+import ortMjsUrl from 'onnxruntime-web/ort-wasm-simd-threaded.asyncify.mjs?url';
+import ortWasmPlainUrl from 'onnxruntime-web/ort-wasm-simd-threaded.wasm?url';
+import ortMjsPlainUrl from 'onnxruntime-web/ort-wasm-simd-threaded.mjs?url';
 import type { WorkerEvent, WorkerRequest } from '../lib/protocol';
 import { loadPipeline, transcribe, type AsrPipeline, type Loaded, type PipelineFactory } from './core';
 
@@ -21,7 +27,21 @@ async function hasWebGPU(): Promise<boolean> {
   }
 }
 
+/** Older Safari cannot run the asyncify build without WebGPU (mirrors transformers.js' own check). */
+function useAsyncify(device: string): boolean {
+  const ua = navigator.userAgent;
+  const safari = /Safari\//.test(ua) && !/Chrome|Chromium|Edg\//.test(ua);
+  const version = Number(ua.match(/Version\/(\d+)/)?.[1] ?? 0);
+  return !(safari && version < 26 && device !== 'webgpu');
+}
+
 const factory: PipelineFactory = async ({ modelId, device, dtype, localModelPath, onProgress }) => {
+  const onnx = env.backends.onnx as { wasm?: { wasmPaths?: unknown } };
+  if (onnx.wasm) {
+    onnx.wasm.wasmPaths = useAsyncify(device)
+      ? { wasm: new URL(ortWasmUrl, self.location.href).href, mjs: new URL(ortMjsUrl, self.location.href).href }
+      : { wasm: new URL(ortWasmPlainUrl, self.location.href).href, mjs: new URL(ortMjsPlainUrl, self.location.href).href };
+  }
   if (localModelPath) {
     env.allowRemoteModels = false;
     env.allowLocalModels = true;
