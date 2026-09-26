@@ -93,6 +93,9 @@ export async function transcribe(
       language: req.language === 'auto' ? undefined : req.language,
       task: 'transcribe',
       return_timestamps: req.timestamps,
+      // Bangla needs ~30 byte-level tokens per second of speech. Allow 50% headroom but no
+      // more, so a model stuck in a repetition loop stops early instead of filling 448 tokens.
+      max_new_tokens: Math.min(440, Math.ceil((piece.end - piece.start) * 45) + 20),
     });
     const segments =
       req.timestamps && output.chunks?.length

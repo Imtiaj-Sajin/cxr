@@ -37,3 +37,17 @@ test('real model transcribes speech in the browser worker', async ({ page }) => 
   expect(texts.join(' ').toLowerCase()).toContain('rice');
   expect(errors).toEqual([]);
 });
+
+test('warns when a weak model does not produce Bangla script', async ({ page }) => {
+  test.setTimeout(240_000);
+  const url = '/?localModels=/test-models/&model=Xenova/whisper-tiny';
+  await page.goto(url);
+  await page.evaluate(() => localStorage.clear());
+  await page.goto(url);
+  // whisper-tiny cannot really transcribe Bangla; it answers in English, which the app detects.
+  await page.getByTestId('file-input').setInputFiles(path.resolve(import.meta.dirname, '../fixtures/speech-bn.webm'));
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 30_000 });
+  await page.getByTestId('start').click();
+  await expect(page.getByTestId('outcome')).toBeVisible({ timeout: 200_000 });
+  await expect(page.getByTestId('wrong-script')).toBeVisible();
+});

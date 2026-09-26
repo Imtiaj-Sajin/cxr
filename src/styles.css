@@ -279,6 +279,10 @@ a {
   color: var(--success-text);
   font-weight: 600;
 }
+.banner.warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
 .banner.info {
   background: var(--surface-2);
 }

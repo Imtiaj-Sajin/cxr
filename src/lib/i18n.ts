@@ -62,6 +62,8 @@ const en = {
   'done.title': 'Done! {count} subtitles in {time}.',
   'done.cancelled': 'Stopped. {count} subtitles so far.',
   'done.noSpeech': 'No speech was found in this file.',
+  'done.wrongScript':
+    'Many lines are not in Bangla script, so the model probably struggled with this audio. Try a more accurate model (Balanced or a Bangla fine-tuned model) for better results.',
   'error.decode':
     'Your browser could not read the audio in this file. Try converting it to MP4 or MP3, or use Chrome.',
   'error.model': 'Could not run the speech model: {message}',
@@ -181,6 +183,8 @@ const bn: Record<MessageKey, string> = {
   'done.title': 'হয়ে গেছে! {time}-এ {count}টি সাবটাইটেল।',
   'done.cancelled': 'থামানো হয়েছে। এ পর্যন্ত {count}টি সাবটাইটেল।',
   'done.noSpeech': 'এই ফাইলে কোনো কথা পাওয়া যায়নি।',
+  'done.wrongScript':
+    'অনেক লাইন বাংলা হরফে আসেনি, তাই মডেলটি সম্ভবত এই অডিও ঠিকমতো বুঝতে পারেনি। ভালো ফলাফলের জন্য আরও নির্ভুল মডেল (ব্যালান্সড বা বাংলা ফাইন-টিউনড) দিয়ে চেষ্টা করুন।',
   'error.decode':
     'আপনার ব্রাউজার এই ফাইলের অডিও পড়তে পারেনি। MP4 বা MP3-তে কনভার্ট করে দেখুন, অথবা Chrome ব্যবহার করুন।',
   'error.model': 'স্পিচ মডেল চালানো যায়নি: {message}',

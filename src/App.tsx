@@ -14,7 +14,7 @@ import { decodeFile, detectWebGPU, type DecodedAudio } from './lib/audio';
 import { createEngine } from './lib/engine';
 import { findModel, DEFAULT_MODEL_ID } from './lib/models';
 import { parseSubtitles } from './lib/subtitles';
-import { normalizeDanda, tidySegments, toBanglaDigits, toLatinDigits } from './lib/postprocess';
+import { nonBanglaShare, normalizeDanda, tidySegments, toBanglaDigits, toLatinDigits } from './lib/postprocess';
 import {
   activeIndex,
   deleteSegment,
@@ -283,6 +283,9 @@ export default function App() {
   }, []);
 
   const activeIdx = useMemo(() => activeIndex(segments, time), [segments, time]);
+  // Only judged right after a Bangla transcription, not for imported subtitle files.
+  const wrongScript =
+    outcome?.kind === 'done' && prefs.speechLanguage === 'bengali' && segments.length >= 2 && nonBanglaShare(segments) > 0.4;
 
   const outcomeText = !outcome
     ? null
@@ -367,6 +370,13 @@ export default function App() {
               <div className={`banner ${outcome?.kind === 'done' && segments.length > 0 ? 'success' : 'info'}`} role="status" data-testid="outcome">
                 <Icon name={outcome?.kind === 'done' ? 'check' : 'clock'} size={18} />
                 <span>{outcomeText}</span>
+              </div>
+            )}
+
+            {!working && wrongScript && (
+              <div className="banner warn" role="status" data-testid="wrong-script">
+                <Icon name="chip" size={18} />
+                <span>{t('done.wrongScript')}</span>
               </div>
             )}
 

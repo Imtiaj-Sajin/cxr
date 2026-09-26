@@ -33,7 +33,10 @@ export interface SegmentationOptions {
 
 const DEFAULTS: Required<SegmentationOptions> = {
   frameSec: 0.03,
-  maxPieceSec: 20,
+  // Whisper can emit at most 448 tokens per window, and its tokenizer spends about two
+  // tokens per Bangla character (~30 tokens per second of normal speech). 12 s pieces
+  // leave headroom for fast speakers.
+  maxPieceSec: 12,
   targetPieceSec: 6,
   minGapSec: 0.35,
   breakGapSec: 1.2,

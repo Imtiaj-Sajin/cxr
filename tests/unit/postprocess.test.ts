@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   chunksToCues,
+  nonBanglaShare,
   cleanTranscript,
   collapseRepeats,
   isLikelyHallucination,
@@ -51,6 +52,11 @@ describe('hallucination handling', () => {
     expect(collapseRepeats('না না না')).toBe('না না না');
     expect(collapseRepeats('আমি আমি আমি আমি আমি আমি')).toBe('আমি আমি');
     expect(collapseRepeats('ভালো আছি ভালো আছি ভালো আছি ভালো আছি ভালো আছি শেষ')).toBe('ভালো আছি শেষ');
+  });
+  it('collapses runaway punctuation and loops without spaces', () => {
+    expect(cleanTranscript('আমি যাব' + '.'.repeat(300))).toBe('আমি যাব...');
+    expect(cleanTranscript('হা' + 'হা'.repeat(20) + ' শেষ')).toBe('হাহা শেষ');
+    expect(cleanTranscript('হাহাহা ঠিক আছে')).toBe('হাহাহা ঠিক আছে');
   });
   it('cleans special tokens and whitespace', () => {
     expect(cleanTranscript('<|bn|>  আমি   ভালো\nআছি ')).toBe('আমি ভালো আছি');
@@ -129,5 +135,13 @@ describe('tidySegments', () => {
       [3, 5, 'খ'],
       [6, 6.4, 'গ'],
     ]);
+  });
+});
+
+describe('nonBanglaShare', () => {
+  it('measures cues written in another script', () => {
+    expect(nonBanglaShare([{ text: 'আমি' }, { text: 'I am' }, { text: '...' }])).toBe(0.5);
+    expect(nonBanglaShare([])).toBe(0);
+    expect(nonBanglaShare([{ text: 'ফেসবুক Facebook' }])).toBe(0);
   });
 });

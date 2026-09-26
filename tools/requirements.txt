@@ -1,0 +1,12 @@
+# Model conversion (tools/convert_model.py)
+torch
+transformers>=4.45,<5
+optimum-onnx[onnxruntime]
+onnx
+onnx_ir
+huggingface_hub
+
+# Evaluation data (tools/prepare_eval_data.py)
+datasets
+soundfile
+numpy

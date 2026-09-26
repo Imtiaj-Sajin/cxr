@@ -83,6 +83,8 @@ export function collapseRepeats(text: string, maxRepeats = 3): string {
 export function cleanTranscript(text: string): string {
   const cleaned = text
     .replace(/<\|[^|]*\|>/g, ' ') // stray special tokens such as <|bn|>
+    .replace(/([.…।,!?\-_*~])\1{3,}/g, (_m, ch: string) => (ch === '.' ? '...' : ch)) // "............" -> "..."
+    .replace(/(\S{1,8}?)\1{5,}/gu, '$1$1') // loops without spaces: "হাহাহাহাহাহাহা" -> "হাহা"
     .replace(/\s+/g, ' ')
     .trim();
   return collapseRepeats(cleaned);
@@ -219,4 +221,15 @@ export function tidySegments(segments: Segment[], minDuration = 0.4): Segment[] 
 
 function round3(n: number): number {
   return Math.round(n * 1000) / 1000;
+}
+
+/**
+ * Share of cues (0..1) that contain letters but no Bangla script. When Bangla was
+ * requested, a high share means the model failed and wrote English or a translation.
+ */
+export function nonBanglaShare(segments: { text: string }[]): number {
+  const withLetters = segments.filter((s) => /\p{L}/u.test(s.text));
+  if (withLetters.length === 0) return 0;
+  const foreign = withLetters.filter((s) => !/[\u0980-\u09FF]/.test(s.text));
+  return foreign.length / withLetters.length;
 }
