@@ -22,6 +22,11 @@ export async function decodeFile(file: Blob): Promise<DecodedAudio> {
   } catch {
     throw new Error('DECODE_FAILED');
   }
+  // decodeAudioData already resamples to the context rate; then a plain channel average
+  // is enough and avoids a second full-length render (which doubles memory use).
+  if (decoded.sampleRate === TARGET_SAMPLE_RATE) {
+    return { samples: downmix(decoded), sampleRate: TARGET_SAMPLE_RATE, duration: decoded.duration };
+  }
   const length = Math.max(1, Math.ceil(decoded.duration * TARGET_SAMPLE_RATE));
   const ctx = new OfflineAudioContext(1, length, TARGET_SAMPLE_RATE);
   const src = ctx.createBufferSource();
@@ -30,6 +35,18 @@ export async function decodeFile(file: Blob): Promise<DecodedAudio> {
   src.start();
   const rendered = await ctx.startRendering();
   return { samples: rendered.getChannelData(0), sampleRate: TARGET_SAMPLE_RATE, duration: decoded.duration };
+}
+
+export function downmix(buffer: AudioBuffer): Float32Array {
+  if (buffer.numberOfChannels === 1) return buffer.getChannelData(0);
+  const out = new Float32Array(buffer.length);
+  for (let c = 0; c < buffer.numberOfChannels; c++) {
+    const data = buffer.getChannelData(c);
+    for (let i = 0; i < out.length; i++) out[i] += data[i];
+  }
+  const scale = 1 / buffer.numberOfChannels;
+  for (let i = 0; i < out.length; i++) out[i] *= scale;
+  return out;
 }
 
 /** Peak amplitude per bucket, for drawing a waveform. */

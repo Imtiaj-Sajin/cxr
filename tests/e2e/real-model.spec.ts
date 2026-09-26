@@ -51,3 +51,37 @@ test('warns when a weak model does not produce Bangla script', async ({ page }) 
   await expect(page.getByTestId('outcome')).toBeVisible({ timeout: 200_000 });
   await expect(page.getByTestId('wrong-script')).toBeVisible();
 });
+
+test('a model that fails to load returns to the setup screen with an error', async ({ page }) => {
+  const url = '/?localModels=/test-models/&model=nobody/missing-model';
+  await page.goto(url);
+  await page.evaluate(() => localStorage.clear());
+  await page.goto(url);
+  await page.getByTestId('file-input').setInputFiles(VIDEO);
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 30_000 });
+  await page.getByTestId('start').click();
+  await expect(page.getByRole('alert')).toContainText('স্পিচ মডেল চালানো যায়নি', { timeout: 60_000 });
+  await expect(page.getByTestId('start')).toBeVisible();
+});
+
+test('stopping and immediately starting again works with the real worker', async ({ page }) => {
+  test.setTimeout(240_000);
+  const url = '/?localModels=/test-models/&model=Xenova/whisper-tiny';
+  await page.goto(url);
+  await page.evaluate(() => localStorage.clear());
+  await page.goto(url);
+  await page.getByTestId('file-input').setInputFiles(VIDEO);
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 30_000 });
+  await page.locator('select').first().selectOption('english');
+  await page.getByTestId('start').click();
+  await page.getByRole('button', { name: 'থামান' }).click();
+  await expect(page.getByTestId('outcome')).toContainText('থামানো হয়েছে');
+
+  // Start over with the same file right away.
+  await page.getByRole('button', { name: 'নতুন ফাইল' }).click();
+  await page.getByTestId('file-input').setInputFiles(VIDEO);
+  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 30_000 });
+  await page.getByTestId('start').click();
+  await expect(page.getByTestId('outcome')).toContainText('হয়ে গেছে', { timeout: 200_000 });
+  await expect(page.getByTestId('segment').first()).toBeVisible();
+});

@@ -87,6 +87,7 @@ export default function App() {
   const playerRef = useRef<PlayerHandle>(null);
   const attachRef = useRef<HTMLInputElement>(null);
   const lastEdit = useRef<{ id: string; at: number } | null>(null);
+  const decodeToken = useRef(0);
   const segmentsRef = useRef(segments);
   segmentsRef.current = segments;
   const prefsLangRef = useRef(lang);
@@ -153,12 +154,15 @@ export default function App() {
       setOutcome(null);
       setPhase('setup');
       setDecoding(true);
+      // Ignore a slow decode that finishes after the user already picked another file.
+      const token = ++decodeToken.current;
       try {
-        setAudio(await decodeFile(file));
+        const decoded = await decodeFile(file);
+        if (token === decodeToken.current) setAudio(decoded);
       } catch {
-        setError(t('error.decode'));
+        if (token === decodeToken.current) setError(t('error.decode'));
       } finally {
-        setDecoding(false);
+        if (token === decodeToken.current) setDecoding(false);
       }
     },
     [t],
@@ -207,6 +211,9 @@ export default function App() {
       case 'error':
         setWorking(false);
         setError(translate(prefsLangRef.current, 'error.model', { message: e.message }));
+        // Nothing transcribed yet: go back to the setup screen so the user can retry or
+        // pick another model instead of landing in an empty editor.
+        if (segmentsRef.current.length === 0) setPhase('setup');
         break;
     }
   }, []);
@@ -244,6 +251,8 @@ export default function App() {
   }, []);
 
   const reset = useCallback(() => {
+    decodeToken.current++;
+    setDecoding(false);
     if (working) engineRef.current.cancel();
     setWorking(false);
     setPhase('landing');

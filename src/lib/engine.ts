@@ -26,7 +26,12 @@ export class WorkerEngine implements Engine {
   }
 
   cancel(): void {
-    this.worker?.postMessage({ type: 'cancel' });
+    // Stop immediately. A cooperative cancel would only take effect after the current
+    // piece, and a new job sent meanwhile would be ignored by the busy worker. The model
+    // reloads quickly from the browser cache on the next run.
+    this.listener = null;
+    this.worker?.terminate();
+    this.worker = null;
   }
 
   dispose(): void {
