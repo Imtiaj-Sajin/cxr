@@ -1,0 +1,32 @@
+{
+  "name": "kotha",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Free, private Bangla subtitles generated entirely in your browser.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit -p . && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  },
+  "dependencies": {
+    "@fontsource/noto-sans-bengali": "^5.3.0",
+    "@huggingface/transformers": "^4.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}
