@@ -14,6 +14,8 @@ async function freshPage(page: Page, query = '?engine=mock&mockDelay=60') {
 
 test('landing page is in Bangla by default and can switch to English', async ({ page }) => {
   await freshPage(page);
+  // COOP/COEP headers enable SharedArrayBuffer, so the CPU backend can use several threads.
+  expect(await page.evaluate(() => crossOriginIsolated)).toBe(true);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('বাংলা সাবটাইটেল');
   await page.getByTestId('lang-toggle').click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Bangla subtitles in minutes');
