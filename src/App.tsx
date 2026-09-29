@@ -104,7 +104,9 @@ export default function App() {
     return () => engine?.dispose();
   }, []);
 
-  useEffect(() => savePrefs(prefs), [prefs]);
+  useEffect(() => {
+    savePrefs(prefs);
+  }, [prefs]);
   // Surface errors from async code (which React error boundaries cannot catch).
   useEffect(() => {
     const show = (message: string) =>
@@ -121,7 +123,9 @@ export default function App() {
     };
   }, []);
   // Each phase is a new screen: start it at the top (on phones the Start button sits low).
-  useEffect(() => window.scrollTo({ top: 0 }), [phase]);
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [phase]);
   useEffect(() => {
     document.documentElement.lang = lang;
     document.title = `${translate(lang, 'app.name')} · ${translate(lang, 'app.tagline')}`;

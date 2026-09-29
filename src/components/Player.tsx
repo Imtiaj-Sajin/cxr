@@ -55,7 +55,9 @@ export const Player = forwardRef<PlayerHandle, Props>(function Player({ url, kin
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  useEffect(() => onTime(time), [time, onTime]);
+  useEffect(() => {
+    onTime(time);
+  }, [time, onTime]);
 
   const idx = activeIndex(segments, time);
   const caption = idx >= 0 ? segments[idx].text : '';
