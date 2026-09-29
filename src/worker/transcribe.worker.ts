@@ -43,9 +43,11 @@ const factory: PipelineFactory = async ({ modelId, device, dtype, localModelPath
       : { wasm: new URL(ortWasmPlainUrl, self.location.href).href, mjs: new URL(ortMjsPlainUrl, self.location.href).href };
   }
   if (localModelPath) {
-    env.allowRemoteModels = false;
-    env.allowLocalModels = true;
-    env.localModelPath = localModelPath;
+    // A custom host (static server or bucket) laid out as <host>/<org>/<model>/<file>.
+    env.allowRemoteModels = true;
+    env.allowLocalModels = false;
+    env.remoteHost = localModelPath;
+    env.remotePathTemplate = '{model}/';
   } else {
     env.allowRemoteModels = true;
     env.allowLocalModels = false;

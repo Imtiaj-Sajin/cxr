@@ -25,50 +25,39 @@ const WHISPER_DTYPE = {
 
 export const BUILTIN_MODELS: ModelOption[] = [
   {
-    id: 'onnx-community/whisper-base',
-    labelKey: 'model.fast',
-    descKey: 'model.fastDesc',
-    sizeMB: { webgpu: 130, wasm: 80 },
+    // Whisper-medium fine-tuned for Bangla (Bengali.AI competition winner). Apache-2.0.
+    id: 'kotha/tugstugi-medium-onnx',
+    labelKey: 'model.accurate',
+    descKey: 'model.accurateDesc',
+    sizeMB: { webgpu: 1500, wasm: 900 },
     dtype: WHISPER_DTYPE,
-    timestamps: true,
-    bangla: false,
+    timestamps: false,
+    bangla: true,
   },
   {
-    id: 'onnx-community/whisper-small',
-    labelKey: 'model.balanced',
-    descKey: 'model.balancedDesc',
-    sizeMB: { webgpu: 420, wasm: 250 },
+    // Whisper-small fine-tuned for Bangla (bangla-speech-processing/BanglaASR). MIT.
+    id: 'kotha/banglaasr-small-onnx',
+    labelKey: 'model.compact',
+    descKey: 'model.compactDesc',
+    sizeMB: { webgpu: 630, wasm: 410 },
     dtype: WHISPER_DTYPE,
-    timestamps: true,
-    bangla: false,
+    timestamps: false,
+    bangla: true,
   },
 ];
 
 /**
- * A Bangla fine-tuned model converted with `tools/convert_model.py`. Set
- * `VITE_BANGLA_MODEL_ID` at build time (for example `your-name/whisper-small-bn-onnx`)
- * and it becomes the default choice.
+ * Where the converted model folders live: an http(s) URL ending in "/" (for example a static
+ * file server or a bucket). Can be overridden per visit with ?localModels=<url>.
  */
-const banglaId = (import.meta.env?.VITE_BANGLA_MODEL_ID as string | undefined)?.trim();
+export const MODEL_HOST = (import.meta.env?.VITE_MODEL_HOST as string | undefined)?.trim() || undefined;
 
-export const BANGLA_MODEL: ModelOption | null = banglaId
-  ? {
-      id: banglaId,
-      labelKey: 'model.bangla',
-      descKey: 'model.banglaDesc',
-      sizeMB: { webgpu: 420, wasm: 250 },
-      dtype: WHISPER_DTYPE,
-      timestamps: false,
-      bangla: true,
-    }
-  : null;
+export const MODELS: ModelOption[] = BUILTIN_MODELS;
 
-export const MODELS: ModelOption[] = BANGLA_MODEL ? [BANGLA_MODEL, ...BUILTIN_MODELS] : BUILTIN_MODELS;
+export const DEFAULT_MODEL_ID = BUILTIN_MODELS[0].id;
 
-export const DEFAULT_MODEL_ID = BANGLA_MODEL?.id ?? 'onnx-community/whisper-small';
-
-/** Phones get the small model unless a Bangla model is configured. */
-export const PHONE_DEFAULT_MODEL_ID = BANGLA_MODEL?.id ?? 'onnx-community/whisper-base';
+/** Phones get the small model. */
+export const PHONE_DEFAULT_MODEL_ID = BUILTIN_MODELS[1].id;
 
 /** Build an option for a model id typed in by the user. */
 export function customModel(id: string, timestamps = false): ModelOption {

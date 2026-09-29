@@ -13,7 +13,7 @@ import { Waveform } from './components/Waveform';
 import { emptyHistory, historyReducer } from './state';
 import { decodeFile, detectWebGPU, type DecodedAudio } from './lib/audio';
 import { createEngine } from './lib/engine';
-import { findModel, DEFAULT_MODEL_ID, PHONE_DEFAULT_MODEL_ID } from './lib/models';
+import { findModel, DEFAULT_MODEL_ID, PHONE_DEFAULT_MODEL_ID, MODEL_HOST } from './lib/models';
 import { isLowMemoryDevice } from './lib/device';
 import { parseSubtitles } from './lib/subtitles';
 import { nonBanglaShare, normalizeDanda, tidySegments, toBanglaDigits, toLatinDigits } from './lib/postprocess';
@@ -271,7 +271,7 @@ export default function App() {
         task: prefs.task,
         timestamps: model.timestamps,
         cueOptions: { maxLineChars: prefs.maxLineChars, maxLines: 2 },
-        localModelPath: new URLSearchParams(location.search).get('localModels') ?? undefined,
+        localModelPath: new URLSearchParams(location.search).get('localModels') ?? MODEL_HOST,
       },
       onEvent,
     );
